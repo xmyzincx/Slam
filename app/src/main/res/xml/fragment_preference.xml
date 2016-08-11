@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="Server">
+
+        <EditTextPreference
+            android:key="server_address"
+            android:title="Server Address"
+            android:defaultValue="@string/default_server_addesss"
+            android:summary="Address of the wristband API"
+            android:dialogTitle="Server Address"/>
+
+        <Preference
+            android:title="Restore defaults"
+            android:key="restore_default_btn"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

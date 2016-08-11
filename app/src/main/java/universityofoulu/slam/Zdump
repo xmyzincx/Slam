@@ -1,0 +1,364 @@
+ @Override
+    public void didDiscoverDevice(BluetoothDevice bluetoothDevice, String deviceName, int rssi, boolean allowed) {
+        // Check if the discovered device can be used with your API key. If allowed is always false,
+        // the device is not linked with your API key. Please check your developer area at
+        // https://www.empatica.com/connect/developer.php
+        Log.d(TAG, String.valueOf(allowed));
+        if (allowed) {
+            Log.d(TAG, "test !!!");
+            // Stop scanning. The first allowed device will do.
+            deviceManager.stopScanning();
+            try {
+                // Connect to the device
+                deviceManager.connectDevice(bluetoothDevice);
+                updateLabel(deviceNameLabel, "To: " + deviceName);
+            } catch (ConnectionNotAllowedException e) {
+                // This should happen only if you try to connect when allowed == false.
+                Toast.makeText(MainActivity.this, "Sorry, you can't connect to this device", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    public void didRequestEnableBluetooth() {
+        // Request the user to enable Bluetooth
+        Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+        startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // The user chose not to enable Bluetooth
+        if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_CANCELED) {
+            // You should deal with this
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void didUpdateSensorStatus(EmpaSensorStatus status, EmpaSensorType type) {
+        // No need to implement this right now
+    }
+
+    @Override
+    public void didUpdateStatus(EmpaStatus status) {
+        // Update the UI
+        updateLabel(statusLabel, status.name());
+
+        // The device manager is ready for use
+        if (status == EmpaStatus.READY) {
+
+            updateLabel(statusLabel, status.name() + " - Turn on your device");
+            // Start scanning
+            deviceManager.startScanning();
+        // The device manager has established a connection
+        } else if (status == EmpaStatus.CONNECTED) {
+            // Stop streaming after STREAMING_TIME
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    dataCnt.setVisibility(View.VISIBLE);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Disconnect device
+                            deviceManager.disconnect();
+                        }
+                    }, STREAMING_TIME);
+                }
+            });
+        // The device manager disconnected from a device
+        } else if (status == EmpaStatus.DISCONNECTED) {
+            updateLabel(deviceNameLabel, "");
+        }
+    }
+
+    @Override
+    public void didReceiveAcceleration(int x, int y, int z, double timestamp) {
+        updateLabel(accel_xLabel, "" + x);
+        updateLabel(accel_yLabel, "" + y);
+        updateLabel(accel_zLabel, "" + z);
+    }
+
+    @Override
+    public void didReceiveBVP(float bvp, double timestamp) {
+        updateLabel(bvpLabel, "" + bvp);
+    }
+
+    @Override
+    public void didReceiveBatteryLevel(float battery, double timestamp) {
+        updateLabel(batteryLabel, String.format("%.0f %%", battery * 100));
+    }
+
+    @Override
+    public void didReceiveGSR(float gsr, double timestamp) {
+        updateLabel(edaLabel, "" + gsr);
+    }
+
+    @Override
+    public void didReceiveIBI(float ibi, double timestamp) {
+        updateLabel(ibiLabel, "" + ibi);
+    }
+
+    @Override
+    public void didReceiveTemperature(float temp, double timestamp) {
+        updateLabel(temperatureLabel, "" + temp);
+    }
+
+    // Update a label with some text, making sure this is run in the UI thread
+    private void updateLabel(final TextView label, final String text) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                label.setText(text);
+            }
+        });
+    }
+}
+
+
+
+
+        urlConnection = (HttpURLConnection) ((new URL(uri).openConnection()));
+        urlConnection.setDoOutput(true);
+        urlConnection.setRequestProperty("Content-Type", "application/json");
+        urlConnection.setRequestProperty("Accept", "application/json");
+        urlConnection.setRequestMethod("POST");
+        urlConnection.connect();
+
+        //Write
+        OutputStream outputStream = urlConnection.getOutputStream();
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+        writer.write(data);
+        writer.close();
+        outputStream.close();
+
+        //Read
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "UTF-8"));
+
+        String line = null;
+        StringBuilder sb = new StringBuilder();
+
+        while ((line = bufferedReader.readLine()) != null) {
+            sb.append(line);
+        }
+
+        bufferedReader.close();
+        result = sb.toString();
+
+
+
+
+
+
+
+            public class DataCollectorThread extends Thread {
+
+                @Override
+                public synchronized void run() {
+                    DataFrame = new JSONObject();
+                    while (true){
+                        while (BVPUpdated) {
+                            if (GSRUpdated) {
+                                DataFrame.put("GSR", vGSR);
+                                GSRUpdated = false;
+                                continue;
+                            } else{} /*if (!GSRUpdated){
+                                //DataFrame.put("GSR", "");
+                            }*/
+                            if (BVPUpdated) {
+                                DataFrame.put("BVP", vBVP);
+                                BVPUpdated = false;
+                            } else{} /*if (!BVPUpdated){
+                                //DataFrame.put("BVP", "");
+                            }*/
+                            if (IBIUpdated) {
+                                DataFrame.put("IBI", vIBI);
+                                IBIUpdated = false;
+                            } else{} /*if (!IBIUpdated) {
+                                //DataFrame.put("IBI", "");
+                            }*/
+                            if (TempUpdated) {
+                                DataFrame.put("Temperature", vTemperature);
+                                TempUpdated = false;
+                            } else{} /*if (!TempUpdated){
+                                //DataFrame.put("Temperature", "");
+                            }*/
+                            if (AccUpdated) {
+                                DataFrame.put("AccXYZ", vAccXYZ);
+                                AccUpdated = false;
+                            } else{} /*if (!AccUpdated){
+                                //DataFrame.put("AccXYZ", "");
+                            }*/
+
+                            //Log.d(TAG, DataFrame.toString());
+                            DataFrame.clear();
+                            /*try {
+                                Thread.sleep(15, 625000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }*/
+                        }
+                    }
+                }
+            }
+
+
+
+                private void sendMessagetoServer(){
+
+                    String udpMsg = "hello world from UDP client " + UDP_SERVER_PORT;
+                    DatagramSocket ds = null;
+                    try {
+
+                        ds = new DatagramSocket();
+                        InetAddress serverAddr = InetAddress.getByName("10.20.42.228");
+                        DatagramPacket dp;
+                        dp = new DatagramPacket(udpMsg.getBytes(), udpMsg.length(), serverAddr, UDP_SERVER_PORT);
+                        ds.send(dp);
+
+                    } catch (SocketException e) {
+                        e.printStackTrace();
+                    }catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        if (ds != null) {
+                            ds.close();
+                        }
+                    }
+                }
+
+
+
+
+
+
+                JsonArrayData = PacketBuffer.poll(10, SECONDS);
+                                        //Log.d(TAG, "JSON array data " + String.valueOf(JsonArrayData));
+                                        senderFunction(JsonArrayData);
+
+
+
+
+        // For checking response time
+        //long tStart = System.currentTimeMillis();
+
+
+                /*// For checking response time
+                long tEnd = System.currentTimeMillis();
+                long tDelta = tEnd - tStart;
+                double elapsedSeconds = tDelta;
+                Log.d(TAG, String.valueOf(elapsedSeconds));*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public class DataCollectorTask implements Runnable {
+
+        private int w;
+        private int x;
+        private int y;
+        private int z;
+        private JSONArray BVPJSONarray;
+        private JSONArray GSRJSONarray;
+        private JSONArray AccJSONarray;
+        private JSONArray TempJSONarray;
+
+        @Override
+        public void run() {
+            if (!BVPBuffer.isEmpty()){
+                for (w = 0; w < BVPsf; w++) {
+                    BVPJSONarray = new JSONArray();
+                    BVPJSONarray.add(BVPBuffer.poll());
+                    //Log.d(TAG, "Buffer size: " + BVPQueue.size());
+                }
+                DataFrame.put("BVP", BVPJSONarray);
+                //Log.d(TAG, "Array size: " + tempJSONarray.size());
+            }
+            if (!GSRBuffer.isEmpty()){
+                for (x = 0; x < GSRsf; x++) {
+                    GSRJSONarray = new JSONArray();
+                    GSRJSONarray.add(GSRBuffer.poll());
+                    //Log.d(TAG, "Buffer size: " + BVPQueue.size());
+                }
+                DataFrame.put("GSR", GSRJSONarray);
+                //Log.d(TAG, "Array size: " + tempJSONarray.size());
+            }
+            if (!AccBuffer.isEmpty()){
+                for (y = 0; y < Accsf; y++) {
+                    AccJSONarray = new JSONArray();
+                    AccJSONarray.add(AccBuffer.poll());
+                    //Log.d(TAG, "Buffer size: " + BVPQueue.size());
+                }
+                DataFrame.put("AccXYZ", AccJSONarray);
+                //Log.d(TAG, "Array size: " + tempJSONarray.size());
+            }
+            if (!TempBuffer.isEmpty()){
+                for (z = 0; z < TEMPsf; z++) {
+                    TempJSONarray = new JSONArray();
+                    TempJSONarray.add(TempBuffer.poll());
+                    //Log.d(TAG, "Buffer size: " + BVPQueue.size());
+                }
+                DataFrame.put("Temperature", TempJSONarray);
+                Log.d(TAG, "Data frame: " + DataFrame.toString());
+                DataFrame = new JSONObject();
+            }
+
+            //utilities.Utilities.generateTestingResults("SLAM_result", DataFrame.toString());
+        }
+    }
+
+
+
+
+
+
+
+
+
+        // private volatile JSONArray vAccXYZ = new JSONArray();
+        public volatile LinkedBlockingQueue<JSONArray> AccBuffer = new LinkedBlockingQueue<JSONArray>(1000);
+
+        // private volatile JSONArray vTemperature = new JSONArray();
+        public volatile LinkedBlockingQueue<JSONArray> TempBuffer = new LinkedBlockingQueue<JSONArray>(500);
+
+        // private volatile JSONArray vIBI = new JSONArray();
+        public volatile LinkedBlockingQueue<JSONArray> IBIBuffer = new LinkedBlockingQueue<JSONArray>(500);
+
+        // private volatile JSONArray vBVP = new JSONArray();
+        public volatile LinkedBlockingQueue<JSONArray> BVPBuffer = new LinkedBlockingQueue<JSONArray>(1000);
+
+        private JSONArray vGSR = new JSONArray();
+        public volatile LinkedBlockingQueue<JSONArray> GSRBuffer = new LinkedBlockingQueue<JSONArray>(500);
+
+
+
+
+                scheduler.schedule(new Runnable() {
+                    public void run() {
+                        timeHandle.cancel(false);
+                    }
+                    // 7200 is the total time to run this scheduler
+                }, 7200, SECONDS);
+         }
+
+
+
+                 SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                 SP.edit().clear().commit();

@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Slam</string>
+    <string name="controller_service">Controller Service</string>
+    <string name="menu">Settings</string>
+
+
+    <!-- Strings related to Settings -->
+    <string name="title_first_section">Server</string>
+    <string name="title_edittext_preference">Server address</string>
+    <string name="summary_edittext_preference">Server address</string>
+    <string name="dialog_title_edittext_preference">Server address</string>
+    <string name="default_server_addesss">https://edx.oulu.fi/slam/wristbandAPIv2/</string>
+
+    <string name="title_second_section">Application</string>
+
+</resources>

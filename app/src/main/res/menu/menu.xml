@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/preferences"
+        android:title="Preferences"
+        android:icon="@drawable/general_desk"
+        android:showAsAction="always"
+        app:showAsAction="always"/>
+
+</menu>

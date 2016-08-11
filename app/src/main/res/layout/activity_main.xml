@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@style/AppTheme"
+    tools:context="universityofoulu.slam.MainActivity">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical"
+        android:id="@+id/linearLayout">
+
+    </LinearLayout>
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar"
+        android:layout_above="@+id/linearLayout"
+        android:layout_alignStart="@+id/linearLayout" />
+
+    <ToggleButton
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/toggle_btn"
+        android:background="@drawable/start_btn"
+        android:layout_below="@+id/toolbar"
+        android:textOff=""
+        android:textOn=""
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="49dp" />
+
+</RelativeLayout>
+
+

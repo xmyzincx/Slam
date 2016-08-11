@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<preference-headers
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <header
+        android:fragment="universityofoulu.slam.PreferenceMenu.PrefFragment"
+        android:title="Server address"
+        android:summary="@string/default_server_addesss" />
+
+</preference-headers>
